@@ -7,13 +7,20 @@
 
 import SwiftUI
 
+enum DifficultyOptions: String, CaseIterable {
+    case easy
+    case hard
+}
+
 struct ContentView: View {
     
-    @State private var tableSelection = 2
-    @State private var numQuestions = 5
+    @State private var showSheet: Bool = false
+    @State private var tableSelection: Int = 2
+    @State private var numQuestions: Int = 5
     
     let numQuestionsOptions = [5, 10, 15, 20]
-    let tables = Array(2...15)
+    
+    @State private var difficulty: DifficultyOptions = DifficultyOptions.easy
     
     let columns = [
         GridItem(.flexible()),
@@ -24,8 +31,11 @@ struct ContentView: View {
     ]
     
     var body: some View {
+        
         Text("Multiply")
             .padding(.vertical, 30)
+            .kerning(4)
+            .fontDesign(.monospaced)
             .frame(maxWidth: .infinity)
             .font(.title)
             .fontWeight(.bold)
@@ -55,33 +65,54 @@ struct ContentView: View {
             
             Spacer()
             
-            Text("How many problems do you want to practice?")
-                .padding(.bottom, 15)
-                .font(.headline)
-            
-            Picker("How many problems do you want to practice?", selection: $numQuestions) {
-                ForEach(numQuestionsOptions, id: \.self) { option in
-                    Text("\(option)")
+            HStack {
+                Text("# of Problems")
+                    .font(.headline)
+                
+                Picker("How many problems do you want to practice?", selection: $numQuestions) {
+                    ForEach(numQuestionsOptions, id: \.self) { option in
+                        Text("\(option)")
+                    }
                 }
+                .pickerStyle(.palette)
             }
-            .pickerStyle(.segmented)
             
             Spacer()
-            Button(action: {
-                // Start game
-            }, label: {
-                HStack {
-                    Text("START")
-                        .fontWeight(.bold)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .foregroundStyle(.white)
-                        .background(.purple)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+            
+            HStack {
+                Text("Difficulty: ")
+                    .font(.headline)
+                
+                Picker("Difficulty", selection: $difficulty) {
+                    ForEach(DifficultyOptions.allCases, id: \.self) { option in
+                        Text(option.rawValue.capitalized)
+                    }
                 }
+                .pickerStyle(.palette)
+            }
+            
+            Spacer()
+            
+            Button(action: {
+                showSheet.toggle()
+            }, label: {
+                Text("Start".uppercased())
+                    .fontWeight(.bold)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(.white)
+                    .background(.purple)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            })
+            .fullScreenCover(isPresented: $showSheet, content: {
+                GameView(tableSelection: $tableSelection, numQuestions: $numQuestions, difficulty: $difficulty)
             })
         }
         .padding()
+    }
+    
+    func newGame() {
+        
     }
 }
 
