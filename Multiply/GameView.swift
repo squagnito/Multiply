@@ -13,11 +13,14 @@ struct GameView: View {
     @Binding var numQuestions: Int
     @Binding var difficulty: DifficultyOptions
     
-    @State private var firstNumber: Int = 2
-    @State private var secondNumber: Int = 2
+    @State private var firstNumber: Int = 4
+    @State private var secondNumber: Int = 4
     @State private var answer: String = ""
-    
     @State private var score: Int = 0
+    @State private var attempts: Int = 0
+    @State private var gameEnded: Bool = false
+    
+    @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
         ZStack {
@@ -34,20 +37,16 @@ struct GameView: View {
                     
                     Spacer()
                     
-                    Button {
-                        // Dismiss keyboard
-                    } label: {
-                        Text("Done")
-                            .font(.title)
-                            .foregroundStyle(.purple)
-                    }
-
+                    Text("Score: \(score) / \(attempts)")
+                        .font(.title2)
                 }
                 Spacer()
             }
             .padding()
             
             VStack {
+                Spacer()
+                
                 Text("What is \(firstNumber) x \(secondNumber) ?")
                     .font(.title)
                     .padding()
@@ -57,14 +56,18 @@ struct GameView: View {
                 Text("Answer:")
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
+                    .fontWeight(.semibold)
                 
-                TextField("Enter your answer here", text: $answer)
+                TextField("", text: $answer)
                     .padding()
                     .keyboardType(.numberPad)
                     .textFieldStyle(.roundedBorder)
                     .multilineTextAlignment(.center)
+                    .font(.title)
+                    .focused($isTextFieldFocused)
+                
                 Button {
-                        
+                    submitAnswer()
                 } label: {
                     Text("Submit")
                         .font(.headline)
@@ -82,11 +85,31 @@ struct GameView: View {
             
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            generateQuestion()
+            isTextFieldFocused = true
+        }
     }
     
     func generateQuestion() {
         firstNumber = Int.random(in: 2...tableSelection)
         secondNumber = Int.random(in: 2...tableSelection)
+    }
+    
+    func submitAnswer() {
+        if Int(answer) == firstNumber * secondNumber {
+            score += 1
+        }
+        attempts += 1
+        answer = ""
+        
+        if attempts >= numQuestions {
+            // Game ends
+        }
+        else {
+            generateQuestion()
+            isTextFieldFocused = true
+        }
     }
 }
 

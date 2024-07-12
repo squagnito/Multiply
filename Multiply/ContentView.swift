@@ -15,7 +15,7 @@ enum DifficultyOptions: String, CaseIterable {
 struct ContentView: View {
     
     @State private var showSheet: Bool = false
-    @State private var tableSelection: Int = 2
+    @State private var tableSelection: Int = 4
     @State private var numQuestions: Int = 5
     
     let numQuestionsOptions = [5, 10, 15, 20]
@@ -48,7 +48,7 @@ struct ContentView: View {
                 .font(.headline)
             
             LazyVGrid(columns: columns, spacing: 20) {
-                ForEach(2..<21) { number in
+                ForEach(4..<21) { number in
                     Button(action: {
                         tableSelection = number
                     }, label: {
@@ -109,10 +109,6 @@ struct ContentView: View {
             })
         }
         .padding()
-    }
-    
-    func newGame() {
-        
     }
 }
 
